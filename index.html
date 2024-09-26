@@ -165,20 +165,20 @@
             <input type="number" id="availableDrivingTime" step="0.1" required>
 
             <label for="onDutyTime">On Duty Time (hours):</label>
-            <input type="number" id="onDutyTime" step="0.1" required>
+            <input type="number" id="onDutyTime" value="14" min="1" max="14" required>
 
             <label for="cycleTime">Cycle Time (hours):</label>
-            <input type="number" id="cycleTime" step="0.1" required>
+            <input type="number" id="cycleTime" value="70" min="1" max="70" required>
 
             <label for="maxDrivingHours">Maximum Driving Hours per Day:</label>
-            <input type="number" id="maxDrivingHours" step="0.1" required>
+            <input type="number" id="maxDrivingHours" value="11" min="1" max="11">
 
             <button type="submit">Calculate Stops</button>
         </form>
         <div id="output"></div>
         <div id="map"></div>
     </div>
-    <script src="hosPlanner4.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASI0J9rev9-NmWnNmSV8gqG_uOOR1-19Y&libraries=places&callback=initMap" async defer></script>
+    <script src="hosPlanner5.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASI0J9rev9-NmWnNmSV8gqG_uOOR1-19Y&libraries=places&callback=initMap"></script>
 </body>
 </html>
