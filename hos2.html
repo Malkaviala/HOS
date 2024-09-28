@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>34-Hour Reset Calculator</title>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f2f2f7;
+            margin: 0;
+            padding: 20px;
+            min-height: 110vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            width: 100%;
+            max-width: 370px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #000;
+            text-align: center;
+            font-size: 24px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 16px;
+        }
+        input[type="datetime-local"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 18px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin-bottom: 10px;
+        }
+        button:active {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 16px;
+            text-align: center;
+            color: #333;
+        }
+        #timer {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            color: #007aff;
+        }
+        #resetButton {
+            background-color: #ff3b30;
+            font-size: 14px;
+            padding: 8px;
+        }
+        #resetButton:active {
+            background-color: #d63a2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>34-Hour Reset Calculator</h1>
+        <div class="input-group">
+            <label for="startTime">Start Time:</label>
+            <input type="datetime-local" id="startTime">
+        </div>
+        <button onclick="calculateReset()">Calculate</button>
+        <button id="resetButton" onclick="resetCalculator()">Reset</button>
+        <div id="result" class="result"></div>
+        <div id="timer"></div>
+    </div>
+
+    <script>
+        let countdownInterval;
+
+        function calculateReset() {
+            const startTimeInput = document.getElementById("startTime");
+            const resultDiv = document.getElementById("result");
+            const timerDiv = document.getElementById("timer");
+
+            if (startTimeInput.value) {
+                const startDateTime = new Date(startTimeInput.value);
+                const resetEndTime = new Date(startDateTime.getTime() + 34 * 60 * 60 * 1000);
+                
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric', 
+                    hour: 'numeric', 
+                    minute: 'numeric',
+                    hour12: true
+                };
+                
+                resultDiv.innerHTML = `
+                    <strong>Reset Complete:</strong><br>
+                    ${resetEndTime.toLocaleString('en-US', options)}
+                `;
+
+                // Save to local storage
+                localStorage.setItem('startTime', startDateTime.toISOString());
+                localStorage.setItem('resetEndTime', resetEndTime.toISOString());
+
+                startCountdown(resetEndTime);
+            } else {
+                resultDiv.innerHTML = "Please enter a start time.";
+                timerDiv.innerHTML = "";
+            }
+        }
+
+        function startCountdown(resetEndTime) {
+            const timerDiv = document.getElementById("timer");
+
+            // Clear any existing countdown
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+
+            // Start the countdown
+            countdownInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = new Date(resetEndTime) - now;
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    timerDiv.innerHTML = "Reset Complete!";
+                } else {
+                    const hours = Math.floor(distance / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    timerDiv.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+                }
+            }, 1000);
+        }
+
+        function resetCalculator() {
+            localStorage.removeItem('startTime');
+            localStorage.removeItem('resetEndTime');
+            document.getElementById("startTime").value = "";
+            document.getElementById("result").innerHTML = "";
+            document.getElementById("timer").innerHTML = "";
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+        }
+
+        // Load saved data on page load
+        window.onload = function() {
+            const savedStartTime = localStorage.getItem('startTime');
+            const savedResetEndTime = localStorage.getItem('resetEndTime');
+
+            if (savedStartTime && savedResetEndTime) {
+                document.getElementById("startTime").value = savedStartTime.slice(0, 16);
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric', 
+                    hour: 'numeric', 
+                    minute: 'numeric',
+                    hour12: true
+                };
+                document.getElementById("result").innerHTML = `
+                    <strong>Reset Complete:</strong><br>
+                    ${new Date(savedResetEndTime).toLocaleString('en-US', options)}
+                `;
+                startCountdown(savedResetEndTime);
+            } else {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById("startTime").value = now.toISOString().slice(0, 16);
+            }
+        }
+    </script>
+</body>
+</html>
