@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>10-Hour Reset Calculator</title>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f2f2f7;
+            margin: 0;
+            padding: 40px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background-color: white;
+            padding: 50px;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.12);
+            width: 100%;
+            max-width: 800px;
+        }
+        h1 {
+            margin-bottom: 40px;
+            color: #000;
+            text-align: center;
+            font-size: 33px;
+            font-weight: bold;
+        }
+        .input-group {
+            margin-bottom: 40px;
+        }
+        label {
+            display: block;
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 28px;
+            font-weight: 500;
+        }
+        input[type="datetime-local"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 3px solid #d1d1d6;
+            border-radius: 16px;
+            font-size: 24px;
+        }
+        button {
+            padding: 25px;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 32px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin-bottom: 25px;
+        }
+        button:active {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 40px;
+            font-size: 32px;
+            text-align: center;
+            color: #333;
+        }
+        #timer {
+            font-size: 56px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 40px;
+            color: #007aff;
+        }
+        #resetButton {
+            background-color: #ff3b30;
+            font-size: 28px;
+            padding: 20px;
+        }
+        #resetButton:active {
+            background-color: #d63a2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="hos.html">34H Reset Calculator</a>
+        <h1>HOS 10-Hours Break Calculator</h1>
+        <div class="input-group">
+            <label for="startTime">Start Time:</label>
+            <input type="datetime-local" id="startTime">
+        </div>
+        <button onclick="calculateReset()">Calculate</button>
+        <button id="resetButton" onclick="resetCalculator()">Reset</button>
+        <div id="result" class="result"></div>
+        <div id="timer"></div>
+    </div>
+
+    <script>
+        let countdownInterval;
+
+        function calculateReset() {
+            const startTimeInput = document.getElementById("startTime");
+            const resultDiv = document.getElementById("result");
+            const timerDiv = document.getElementById("timer");
+
+            if (startTimeInput.value) {
+                const startDateTime = new Date(startTimeInput.value);
+                const resetEndTime = new Date(startDateTime.getTime() + 10 * 60 * 60 * 1000);
+                
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric', 
+                    hour: 'numeric', 
+                    minute: 'numeric',
+                    hour12: true
+                };
+                
+                resultDiv.innerHTML = `
+                    <strong>Reset Complete:</strong><br>
+                    ${resetEndTime.toLocaleString('en-US', options)}
+                `;
+
+                localStorage.setItem('startTime', startDateTime.toISOString());
+                localStorage.setItem('resetEndTime', resetEndTime.toISOString());
+
+                startCountdown(resetEndTime);
+            } else {
+                resultDiv.innerHTML = "Please enter a start time.";
+                timerDiv.innerHTML = "";
+            }
+        }
+
+        function startCountdown(resetEndTime) {
+            const timerDiv = document.getElementById("timer");
+
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+
+            countdownInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = new Date(resetEndTime) - now;
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    timerDiv.innerHTML = "Reset Complete!";
+                } else {
+                    const hours = Math.floor(distance / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    timerDiv.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+                }
+            }, 1000);
+        }
+
+        function resetCalculator() {
+            localStorage.removeItem('startTime');
+            localStorage.removeItem('resetEndTime');
+            document.getElementById("startTime").value = "";
+            document.getElementById("result").innerHTML = "";
+            document.getElementById("timer").innerHTML = "";
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+        }
+
+        window.onload = function() {
+            const savedStartTime = localStorage.getItem('startTime');
+            const savedResetEndTime = localStorage.getItem('resetEndTime');
+
+            if (savedStartTime && savedResetEndTime) {
+                document.getElementById("startTime").value = savedStartTime.slice(0, 16);
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric', 
+                    hour: 'numeric', 
+                    minute: 'numeric',
+                    hour12: true
+                };
+                document.getElementById("result").innerHTML = `
+                    <strong>Reset Complete:</strong><br>
+                    ${new Date(savedResetEndTime).toLocaleString('en-US', options)}
+                `;
+                startCountdown(savedResetEndTime);
+            } else {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById("startTime").value = now.toISOString().slice(0, 16);
+            }
+        }
+    </script>
+</body>
+</html>
