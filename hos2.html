@@ -21,71 +21,71 @@
         }
         .container {
             background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.12);
             width: 100%;
-            max-width: 370px;
+            max-width: 480px;
         }
         h1 {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             color: #000;
             text-align: center;
-            font-size: 24px;
+            font-size: 32px;
         }
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-size: 16px;
+            margin-bottom: 10px;
+            color: #444;
+            font-size: 20px;
         }
         input[type="datetime-local"] {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            padding: 10px;
+            padding: 15px;
             width: 100%;
             box-sizing: border-box;
-            border: 1px solid #d1d1d6;
-            border-radius: 8px;
-            font-size: 16px;
+            border: 2px solid #d1d1d6;
+            border-radius: 12px;
+            font-size: 18px;
         }
         button {
-            padding: 12px;
+            padding: 16px;
             background-color: #007aff;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             width: 100%;
-            font-size: 18px;
+            font-size: 22px;
             font-weight: 600;
             transition: background-color 0.3s;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         button:active {
             background-color: #0056b3;
         }
         .result {
-            margin-top: 20px;
-            font-size: 16px;
+            margin-top: 30px;
+            font-size: 20px;
             text-align: center;
             color: #333;
         }
         #timer {
-            font-size: 24px;
+            font-size: 36px;
             font-weight: bold;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 30px;
             color: #007aff;
         }
         #resetButton {
             background-color: #ff3b30;
-            font-size: 14px;
-            padding: 8px;
+            font-size: 18px;
+            padding: 12px;
         }
         #resetButton:active {
             background-color: #d63a2f;
@@ -132,7 +132,6 @@
                     ${resetEndTime.toLocaleString('en-US', options)}
                 `;
 
-                // Save to local storage
                 localStorage.setItem('startTime', startDateTime.toISOString());
                 localStorage.setItem('resetEndTime', resetEndTime.toISOString());
 
@@ -146,12 +145,10 @@
         function startCountdown(resetEndTime) {
             const timerDiv = document.getElementById("timer");
 
-            // Clear any existing countdown
             if (countdownInterval) {
                 clearInterval(countdownInterval);
             }
 
-            // Start the countdown
             countdownInterval = setInterval(() => {
                 const now = new Date().getTime();
                 const distance = new Date(resetEndTime) - now;
@@ -180,7 +177,6 @@
             }
         }
 
-        // Load saved data on page load
         window.onload = function() {
             const savedStartTime = localStorage.getItem('startTime');
             const savedResetEndTime = localStorage.getItem('resetEndTime');
